@@ -1,0 +1,508 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>Cinema Vault</title>
+  <style>
+    :root {
+      --bg: #090a0f;
+      --card-bg: rgba(255, 255, 255, 0.05);
+      --accent: #ffffff;
+      --accent-red: #e50914;
+      --text: #ffffff;
+      --text-sub: #9ca3af;
+      --border: rgba(255, 255, 255, 0.08);
+      --nav-bg: rgba(18, 18, 24, 0.92);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-tap-highlight-color: transparent;
+      user-select: none;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    }
+
+    body {
+      background-color: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      padding-bottom: 96px;
+      overflow-x: hidden;
+    }
+
+    /* Header */
+    header {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 16px 20px;
+      background: rgba(9, 10, 15, 0.85);
+      backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .brand {
+      font-size: 1.15rem;
+      font-weight: 800;
+      letter-spacing: 0.5px;
+    }
+
+    .brand span {
+      color: var(--accent-red);
+    }
+
+    /* Hero Banner */
+    .hero-container {
+      position: relative;
+      width: 100%;
+      height: 60vh;
+      min-height: 400px;
+      max-height: 520px;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      padding: 24px 20px;
+    }
+
+    .hero-backdrop {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      filter: brightness(0.5);
+      z-index: 1;
+    }
+
+    .hero-gradient {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(180deg, rgba(9,10,15,0.2) 0%, rgba(9,10,15,0.75) 65%, var(--bg) 100%);
+      z-index: 2;
+    }
+
+    .hero-content {
+      position: relative;
+      z-index: 3;
+      max-width: 600px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .hero-title {
+      font-size: 1.6rem;
+      font-weight: 800;
+      line-height: 1.2;
+      word-break: break-word;
+    }
+
+    .hero-meta {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 0.85rem;
+      color: var(--text-sub);
+    }
+
+    .badge {
+      background: rgba(255, 255, 255, 0.15);
+      padding: 2px 8px;
+      border-radius: 4px;
+      color: #fff;
+      font-weight: 600;
+      font-size: 0.75rem;
+    }
+
+    .btn-play {
+      background: #fff;
+      color: #000;
+      border: none;
+      padding: 12px 26px;
+      border-radius: 99px;
+      font-weight: 700;
+      font-size: 0.95rem;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      width: fit-content;
+      margin-top: 4px;
+    }
+
+    /* Shelf Library Section */
+    .section-title {
+      padding: 24px 20px 12px;
+      font-size: 1.1rem;
+      font-weight: 700;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .section-title span {
+      font-size: 0.75rem;
+      color: var(--text-sub);
+      letter-spacing: 0.5px;
+    }
+
+    .slider-row {
+      display: flex;
+      gap: 14px;
+      padding: 0 20px 20px;
+      overflow-x: auto;
+      scrollbar-width: none;
+    }
+
+    .slider-row::-webkit-scrollbar {
+      display: none;
+    }
+
+    .media-card {
+      flex: 0 0 170px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      cursor: pointer;
+    }
+
+    .card-thumb {
+      width: 100%;
+      height: 220px;
+      border-radius: 12px;
+      background: #141419;
+      border: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      overflow: hidden;
+      padding: 12px;
+      text-align: center;
+    }
+
+    .card-thumb.active-card {
+      border-color: var(--accent-red);
+      background: rgba(229, 9, 20, 0.08);
+    }
+
+    .card-thumb svg {
+      width: 40px;
+      height: 40px;
+      fill: rgba(255, 255, 255, 0.6);
+      margin-bottom: 8px;
+    }
+
+    .card-title {
+      font-size: 0.85rem;
+      font-weight: 600;
+      word-break: break-word;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    .card-sub {
+      font-size: 0.75rem;
+      color: var(--text-sub);
+    }
+
+    /* Fullscreen Clean Player Modal */
+    #player-modal {
+      position: fixed;
+      inset: 0;
+      background: #000;
+      z-index: 9999;
+      display: none;
+      flex-direction: column;
+    }
+
+    #player-modal.active {
+      display: flex;
+    }
+
+    .modal-bar {
+      padding: 14px 18px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: rgba(0,0,0,0.85);
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 10;
+      backdrop-filter: blur(8px);
+    }
+
+    .player-action-btn {
+      background: rgba(255,255,255,0.18);
+      border: none;
+      color: #fff;
+      padding: 8px 16px;
+      border-radius: 99px;
+      font-size: 0.82rem;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .player-frame-box {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .player-frame-box iframe {
+      width: 100%;
+      height: 100%;
+      border: none;
+    }
+
+    /* Floating Capsule Menu */
+    .bottom-nav-wrap {
+      position: fixed;
+      bottom: 18px;
+      left: 0;
+      right: 0;
+      display: flex;
+      justify-content: center;
+      z-index: 90;
+      pointer-events: none;
+    }
+
+    .bottom-nav {
+      pointer-events: auto;
+      background: var(--nav-bg);
+      backdrop-filter: blur(20px);
+      padding: 6px 10px;
+      border-radius: 99px;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      border: 1px solid var(--border);
+      box-shadow: 0 10px 30px rgba(0,0,0,0.7);
+    }
+
+    .nav-tab {
+      padding: 8px 18px;
+      border-radius: 99px;
+      border: none;
+      background: transparent;
+      color: var(--text-sub);
+      font-size: 0.85rem;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .nav-tab.active {
+      background: #fff;
+      color: #000;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="brand">VAULT<span>.</span></div>
+    <div style="font-size: 0.75rem; color: var(--text-sub);" id="file-counter">Loading files...</div>
+  </header>
+
+  <!-- Hero Banner with Selected File -->
+  <section class="hero-container">
+    <div class="hero-gradient"></div>
+    <div class="hero-content">
+      <h1 class="hero-title" id="hero-title">Select a Video</h1>
+      <div class="hero-meta">
+        <span class="badge">DRIVE STREAM</span>
+        <span id="hero-size">0 MB</span>
+      </div>
+      <button class="btn-play" onclick="playCurrent()">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+        Play Video
+      </button>
+    </div>
+  </section>
+
+  <!-- Folder Contents Shelf -->
+  <div class="section-title">
+    <h3>Video Library</h3>
+    <span id="shelf-subtitle">Cloud Storage</span>
+  </div>
+  <div class="slider-row" id="media-shelf">
+    <!-- Populated dynamically -->
+  </div>
+
+  <!-- Fullscreen Player Modal with Rotation Lock -->
+  <div id="player-modal">
+    <div class="modal-bar">
+      <button class="player-action-btn" onclick="closePlayer()">✕ Close</button>
+      <button class="player-action-btn" onclick="toggleScreenOrientation()">⛶ Rotate Screen</button>
+    </div>
+    <div class="player-frame-box" id="frame-holder"></div>
+  </div>
+
+  <!-- Bottom Floating Capsule -->
+  <div class="bottom-nav-wrap">
+    <nav class="bottom-nav">
+      <button class="nav-tab active">Home</button>
+      <button class="nav-tab">Movies</button>
+      <button class="nav-tab">TV</button>
+      <button class="nav-tab">4K</button>
+    </nav>
+  </div>
+
+  <script>
+    // Exact files from your Google Drive folder with their real original names:
+    const files = [
+      {
+        name: "Genshin Impact 2026.06.19 - 12.33.20.01.mp4",
+        id: "1hiaygZLHAf1L5o4wNMqSA5Y8kgw9E2gC",
+        size: "283.2 MB"
+      },
+      {
+        name: "Genshin Impact 2026.07.03 - 10.04.23.02.mp4",
+        id: "1L6v_B1-8rNtNbf8AuTMt4IGjsTVaOH5v",
+        size: "368.3 MB"
+      },
+      {
+        name: "Genshin Impact 2026.07.02 - 07.09.56.03.mp4",
+        id: "1GF_VSIB3rpMlMgQ8935UaUCZSRnQkADE",
+        size: "55.4 MB"
+      },
+      {
+        name: "Genshin Impact 2026.07.02 - 07.06.26.02.mp4",
+        id: "1USlrnu1C5I6q6xmKJdnLjTJX27iYQY3i",
+        size: "296.3 MB"
+      },
+      {
+        name: "Genshin Impact 2026.07.02 - 07.02.49.01.mp4",
+        id: "1idqjfwiia8Ro0giDZOTw-WlQAAdFfoSh",
+        size: "286.0 MB"
+      },
+      {
+        name: "Genshin Impact 2026.08.27 - 10.34.42.07.mp4",
+        id: "1MPHxZUf8upcCT_zPcZ0HoOWCjtHmFbEB",
+        size: "126.5 MB"
+      },
+      {
+        name: "Genshin Impact 2026.08.27 - 10.33.09.06.mp4",
+        id: "1NIv1LCWqs1DSdxVji0XNDMH7gpOvSftl",
+        size: "33.2 MB"
+      },
+      {
+        name: "Genshin Impact 2026.08.27 - 10.32.07.05.mp4",
+        id: "1v9mgzp-s4vEl2ypvNCWdQ4MU7ynasI3y",
+        size: "99.2 MB"
+      },
+      {
+        name: "Genshin Impact 2026.08.27 - 10.27.52.03.mp4",
+        id: "112CvJRwby-QPcXY-tfxvLAKq-6DqfJ-A",
+        size: "47.9 MB"
+      }
+    ];
+
+    let currentIdx = 0;
+    const shelf = document.getElementById("media-shelf");
+    const heroTitle = document.getElementById("hero-title");
+    const heroSize = document.getElementById("hero-size");
+    const fileCounter = document.getElementById("file-counter");
+    const modal = document.getElementById("player-modal");
+    const frameHolder = document.getElementById("frame-holder");
+
+    function renderShelf() {
+      shelf.innerHTML = "";
+      fileCounter.textContent = `${files.length} Videos Available`;
+
+      files.forEach((file, idx) => {
+        const card = document.createElement("div");
+        card.className = "media-card";
+        card.onclick = () => selectItem(idx);
+        card.innerHTML = `
+          <div class="card-thumb ${idx === currentIdx ? 'active-card' : ''}" id="thumb-${idx}">
+            <svg viewBox="0 0 24 24"><path d="M4 6H2v14c0 1.1.9 2 2 2h14v-2H4V6zm16-4H8c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-8 12.5v-9l6 4.5-6 4.5z"/></svg>
+            <span style="font-size:0.75rem; color:var(--text-sub);">${file.size}</span>
+          </div>
+          <div class="card-title">${file.name}</div>
+        `;
+        shelf.appendChild(card);
+      });
+
+      if (files.length > 0) {
+        selectItem(0);
+      }
+    }
+
+    function selectItem(idx) {
+      currentIdx = idx;
+      heroTitle.textContent = files[idx].name;
+      heroSize.textContent = files[idx].size;
+
+      document.querySelectorAll(".card-thumb").forEach((el, i) => {
+        el.classList.toggle("active-card", i === idx);
+      });
+    }
+
+    function playCurrent() {
+      const activeFile = files[currentIdx];
+      modal.classList.add("active");
+      frameHolder.innerHTML = `
+        <iframe 
+          src="https://drive.google.com/file/d/${activeFile.id}/preview" 
+          allow="autoplay; fullscreen" 
+          allowfullscreen>
+        </iframe>
+      `;
+    }
+
+    function closePlayer() {
+      modal.classList.remove("active");
+      frameHolder.innerHTML = "";
+      if (document.fullscreenElement) {
+        document.exitFullscreen().catch(() => {});
+      }
+      if (screen.orientation && screen.orientation.unlock) {
+        screen.orientation.unlock();
+      }
+    }
+
+    let isLandscape = false;
+    async function toggleScreenOrientation() {
+      try {
+        if (!isLandscape) {
+          if (modal.requestFullscreen) {
+            await modal.requestFullscreen();
+          }
+          if (screen.orientation && screen.orientation.lock) {
+            await screen.orientation.lock("landscape");
+          }
+          isLandscape = true;
+        } else {
+          if (document.exitFullscreen) {
+            await document.exitFullscreen();
+          }
+          if (screen.orientation && screen.orientation.unlock) {
+            screen.orientation.unlock();
+          }
+          isLandscape = false;
+        }
+      } catch (err) {
+        alert("Make sure auto-rotate is toggled on in your phone's quick settings tray.");
+      }
+    }
+
+    renderShelf();
+  </script>
+</body>
+  </html>
+  
