@@ -57,34 +57,43 @@
       color: var(--accent-red);
     }
 
+    .top-actions {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .upload-btn {
+      background: var(--accent-red);
+      color: #fff;
+      border: none;
+      padding: 6px 14px;
+      border-radius: 99px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
     /* Hero Banner */
     .hero-container {
       position: relative;
       width: 100%;
-      height: 60vh;
-      min-height: 400px;
-      max-height: 520px;
-      overflow: hidden;
+      height: 55vh;
+      min-height: 380px;
       display: flex;
       flex-direction: column;
       justify-content: flex-end;
       padding: 24px 20px;
-    }
-
-    .hero-backdrop {
-      position: absolute;
-      inset: 0;
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      filter: brightness(0.5);
-      z-index: 1;
+      background: #111;
     }
 
     .hero-gradient {
       position: absolute;
       inset: 0;
-      background: linear-gradient(180deg, rgba(9,10,15,0.2) 0%, rgba(9,10,15,0.75) 65%, var(--bg) 100%);
+      background: linear-gradient(180deg, rgba(9,10,15,0.2) 0%, rgba(9,10,15,0.85) 75%, var(--bg) 100%);
       z-index: 2;
     }
 
@@ -147,12 +156,6 @@
       align-items: center;
     }
 
-    .section-title span {
-      font-size: 0.75rem;
-      color: var(--text-sub);
-      letter-spacing: 0.5px;
-    }
-
     .slider-row {
       display: flex;
       gap: 14px;
@@ -166,7 +169,7 @@
     }
 
     .media-card {
-      flex: 0 0 170px;
+      flex: 0 0 160px;
       display: flex;
       flex-direction: column;
       gap: 8px;
@@ -175,7 +178,7 @@
 
     .card-thumb {
       width: 100%;
-      height: 220px;
+      height: 200px;
       border-radius: 12px;
       background: #141419;
       border: 1px solid var(--border);
@@ -191,7 +194,7 @@
 
     .card-thumb.active-card {
       border-color: var(--accent-red);
-      background: rgba(229, 9, 20, 0.08);
+      background: rgba(229, 9, 20, 0.1);
     }
 
     .card-thumb svg {
@@ -211,13 +214,8 @@
       overflow: hidden;
     }
 
-    .card-sub {
-      font-size: 0.75rem;
-      color: var(--text-sub);
-    }
-
-    /* Fullscreen Clean Player Modal */
-    #player-modal {
+    /* Fullscreen Player Modal */
+    #player-modal, #upload-modal {
       position: fixed;
       inset: 0;
       background: #000;
@@ -226,7 +224,7 @@
       flex-direction: column;
     }
 
-    #player-modal.active {
+    #player-modal.active, #upload-modal.active {
       display: flex;
     }
 
@@ -258,15 +256,48 @@
     .player-frame-box {
       width: 100%;
       height: 100%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
     }
 
     .player-frame-box iframe {
       width: 100%;
       height: 100%;
       border: none;
+    }
+
+    /* Upload Dialog Styling */
+    .upload-content {
+      margin: auto;
+      max-width: 420px;
+      width: 90%;
+      background: #141419;
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 24px;
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .upload-content h2 {
+      font-size: 1.3rem;
+    }
+
+    .upload-content p {
+      font-size: 0.85rem;
+      color: var(--text-sub);
+      line-height: 1.4;
+    }
+
+    .open-drive-btn {
+      background: #fff;
+      color: #000;
+      text-decoration: none;
+      padding: 12px;
+      border-radius: 10px;
+      font-weight: 700;
+      font-size: 0.9rem;
+      display: block;
     }
 
     /* Floating Capsule Menu */
@@ -303,6 +334,7 @@
       font-size: 0.85rem;
       font-weight: 600;
       cursor: pointer;
+      transition: all 0.2s ease;
     }
 
     .nav-tab.active {
@@ -315,16 +347,22 @@
 
   <header>
     <div class="brand">VAULT<span>.</span></div>
-    <div style="font-size: 0.75rem; color: var(--text-sub);" id="file-counter">Loading files...</div>
+    <div class="top-actions">
+      <button class="upload-btn" onclick="openUploadModal()">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
+        Upload
+      </button>
+      <div style="font-size: 0.75rem; color: var(--text-sub);" id="file-counter">Connecting...</div>
+    </div>
   </header>
 
-  <!-- Hero Banner with Selected File -->
+  <!-- Hero Banner -->
   <section class="hero-container">
     <div class="hero-gradient"></div>
     <div class="hero-content">
-      <h1 class="hero-title" id="hero-title">Select a Video</h1>
+      <h1 class="hero-title" id="hero-title">Connecting to Vault...</h1>
       <div class="hero-meta">
-        <span class="badge">DRIVE STREAM</span>
+        <span class="badge" id="hero-badge">DRIVE STREAM</span>
         <span id="hero-size">0 MB</span>
       </div>
       <button class="btn-play" onclick="playCurrent()">
@@ -334,16 +372,14 @@
     </div>
   </section>
 
-  <!-- Folder Contents Shelf -->
+  <!-- Category Title & Shelf -->
   <div class="section-title">
-    <h3>Video Library</h3>
-    <span id="shelf-subtitle">Cloud Storage</span>
+    <h3 id="category-title">All Media</h3>
+    <span id="shelf-subtitle" style="font-size:0.75rem; color:var(--text-sub);">Direct Stream</span>
   </div>
-  <div class="slider-row" id="media-shelf">
-    <!-- Populated dynamically -->
-  </div>
+  <div class="slider-row" id="media-shelf"></div>
 
-  <!-- Fullscreen Player Modal with Rotation Lock -->
+  <!-- Fullscreen Player Modal -->
   <div id="player-modal">
     <div class="modal-bar">
       <button class="player-action-btn" onclick="closePlayer()">✕ Close</button>
@@ -352,110 +388,154 @@
     <div class="player-frame-box" id="frame-holder"></div>
   </div>
 
-  <!-- Bottom Floating Capsule -->
+  <!-- Upload Modal -->
+  <div id="upload-modal">
+    <div class="modal-bar">
+      <button class="player-action-btn" onclick="closeUploadModal()">✕ Close</button>
+    </div>
+    <div class="upload-content">
+      <h2>Add New Media</h2>
+      <p>Upload your video file directly to the shared folder. Once the file finishes uploading, refresh the page and it will appear on your streaming site automatically.</p>
+      <a class="open-drive-btn" target="_blank" href="https://drive.google.com/drive/folders/1eQH28Ev2UvL5oFsC2ysgGrYNdGtPgD-K">
+        Open Google Drive Folder ↗
+      </a>
+    </div>
+  </div>
+
+  <!-- Bottom Floating Capsule (Fully Interactive) -->
   <div class="bottom-nav-wrap">
     <nav class="bottom-nav">
-      <button class="nav-tab active">Home</button>
-      <button class="nav-tab">Movies</button>
-      <button class="nav-tab">TV</button>
-      <button class="nav-tab">4K</button>
+      <button class="nav-tab active" onclick="switchCategory('all', this)">Home</button>
+      <button class="nav-tab" onclick="switchCategory('movies', this)">Movies</button>
+      <button class="nav-tab" onclick="switchCategory('tv', this)">TV</button>
+      <button class="nav-tab" onclick="switchCategory('4k', this)">4K</button>
     </nav>
   </div>
 
   <script>
-    // Exact files from your Google Drive folder with their real original names:
-    const files = [
-      {
-        name: "Genshin Impact 2026.06.19 - 12.33.20.01.mp4",
-        id: "1hiaygZLHAf1L5o4wNMqSA5Y8kgw9E2gC",
-        size: "283.2 MB"
-      },
-      {
-        name: "Genshin Impact 2026.07.03 - 10.04.23.02.mp4",
-        id: "1L6v_B1-8rNtNbf8AuTMt4IGjsTVaOH5v",
-        size: "368.3 MB"
-      },
-      {
-        name: "Genshin Impact 2026.07.02 - 07.09.56.03.mp4",
-        id: "1GF_VSIB3rpMlMgQ8935UaUCZSRnQkADE",
-        size: "55.4 MB"
-      },
-      {
-        name: "Genshin Impact 2026.07.02 - 07.06.26.02.mp4",
-        id: "1USlrnu1C5I6q6xmKJdnLjTJX27iYQY3i",
-        size: "296.3 MB"
-      },
-      {
-        name: "Genshin Impact 2026.07.02 - 07.02.49.01.mp4",
-        id: "1idqjfwiia8Ro0giDZOTw-WlQAAdFfoSh",
-        size: "286.0 MB"
-      },
-      {
-        name: "Genshin Impact 2026.08.27 - 10.34.42.07.mp4",
-        id: "1MPHxZUf8upcCT_zPcZ0HoOWCjtHmFbEB",
-        size: "126.5 MB"
-      },
-      {
-        name: "Genshin Impact 2026.08.27 - 10.33.09.06.mp4",
-        id: "1NIv1LCWqs1DSdxVji0XNDMH7gpOvSftl",
-        size: "33.2 MB"
-      },
-      {
-        name: "Genshin Impact 2026.08.27 - 10.32.07.05.mp4",
-        id: "1v9mgzp-s4vEl2ypvNCWdQ4MU7ynasI3y",
-        size: "99.2 MB"
-      },
-      {
-        name: "Genshin Impact 2026.08.27 - 10.27.52.03.mp4",
-        id: "112CvJRwby-QPcXY-tfxvLAKq-6DqfJ-A",
-        size: "47.9 MB"
-      }
-    ];
+    // Configured directly with your credentials:
+    const FOLDER_ID = "1eQH28Ev2UvL5oFsC2ysgGrYNdGtPgD-K";
+    const API_KEY = "AIzaSyBXBgFVa3JUm-epxQX4a51lqGEgqhZDIg0";
 
+    let allFiles = [];
+    let displayedFiles = [];
     let currentIdx = 0;
+
     const shelf = document.getElementById("media-shelf");
     const heroTitle = document.getElementById("hero-title");
     const heroSize = document.getElementById("hero-size");
     const fileCounter = document.getElementById("file-counter");
-    const modal = document.getElementById("player-modal");
+    const categoryTitle = document.getElementById("category-title");
+    const playerModal = document.getElementById("player-modal");
+    const uploadModal = document.getElementById("upload-modal");
     const frameHolder = document.getElementById("frame-holder");
+
+    // Fetch video files using your API Key
+    async function loadFolderContents() {
+      const url = `https://www.googleapis.com/drive/v3/files?q='${FOLDER_ID}'+in+parents+and+trashed=false&fields=files(id,name,size,mimeType)&key=${API_KEY}`;
+
+      try {
+        const res = await fetch(url);
+        const data = await res.json();
+
+        if (data.error) {
+          heroTitle.textContent = "Error: " + data.error.message;
+          fileCounter.textContent = "API Error";
+          return;
+        }
+
+        allFiles = data.files.filter(f => 
+          (f.mimeType && f.mimeType.includes("video")) || 
+          f.name.match(/\.(mp4|mkv|webm|mov)$/i)
+        );
+
+        if (allFiles.length === 0) {
+          heroTitle.textContent = "Folder is empty";
+          fileCounter.textContent = "0 videos";
+          shelf.innerHTML = "<p style='padding:20px; color:var(--text-sub);'>No videos found in this folder. Use the Upload button above.</p>";
+          return;
+        }
+
+        displayedFiles = [...allFiles];
+        renderShelf();
+      } catch (err) {
+        heroTitle.textContent = "Network Error";
+        console.error(err);
+      }
+    }
+
+    function formatBytes(bytes) {
+      if (!bytes) return "Stream";
+      const mb = bytes / (1024 * 1024);
+      return mb > 1000 ? (mb / 1024).toFixed(1) + " GB" : mb.toFixed(1) + " MB";
+    }
 
     function renderShelf() {
       shelf.innerHTML = "";
-      fileCounter.textContent = `${files.length} Videos Available`;
+      fileCounter.textContent = `${displayedFiles.length} Videos`;
 
-      files.forEach((file, idx) => {
+      if (displayedFiles.length === 0) {
+        shelf.innerHTML = "<p style='padding:20px; color:var(--text-sub);'>No videos match this category.</p>";
+        heroTitle.textContent = "No Videos in Category";
+        heroSize.textContent = "0 MB";
+        return;
+      }
+
+      displayedFiles.forEach((file, idx) => {
         const card = document.createElement("div");
         card.className = "media-card";
         card.onclick = () => selectItem(idx);
         card.innerHTML = `
           <div class="card-thumb ${idx === currentIdx ? 'active-card' : ''}" id="thumb-${idx}">
             <svg viewBox="0 0 24 24"><path d="M4 6H2v14c0 1.1.9 2 2 2h14v-2H4V6zm16-4H8c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-8 12.5v-9l6 4.5-6 4.5z"/></svg>
-            <span style="font-size:0.75rem; color:var(--text-sub);">${file.size}</span>
+            <span style="font-size:0.75rem; color:var(--text-sub);">${formatBytes(file.size)}</span>
           </div>
           <div class="card-title">${file.name}</div>
         `;
         shelf.appendChild(card);
       });
 
-      if (files.length > 0) {
-        selectItem(0);
-      }
+      selectItem(0);
     }
 
     function selectItem(idx) {
+      if (!displayedFiles[idx]) return;
       currentIdx = idx;
-      heroTitle.textContent = files[idx].name;
-      heroSize.textContent = files[idx].size;
+      heroTitle.textContent = displayedFiles[idx].name;
+      heroSize.textContent = formatBytes(displayedFiles[idx].size);
 
       document.querySelectorAll(".card-thumb").forEach((el, i) => {
         el.classList.toggle("active-card", i === idx);
       });
     }
 
+    // Dynamic Filter handler for Home, Movies, TV, 4K
+    function switchCategory(cat, tabElement) {
+      document.querySelectorAll(".nav-tab").forEach(tab => tab.classList.remove("active"));
+      tabElement.classList.add("active");
+
+      if (cat === "all") {
+        categoryTitle.textContent = "All Media";
+        displayedFiles = [...allFiles];
+      } else if (cat === "movies") {
+        categoryTitle.textContent = "Movies";
+        displayedFiles = allFiles.filter(f => !f.name.match(/s\d{1,2}e\d{1,2}|episode|ep\d/i));
+      } else if (cat === "tv") {
+        categoryTitle.textContent = "TV Series & Shows";
+        displayedFiles = allFiles.filter(f => f.name.match(/s\d{1,2}e\d{1,2}|episode|ep\d|season/i));
+      } else if (cat === "4k") {
+        categoryTitle.textContent = "4K Ultra HD";
+        displayedFiles = allFiles.filter(f => f.name.match(/4k|2160p|uhd/i) || (f.size && f.size > 3000000000));
+      }
+
+      currentIdx = 0;
+      renderShelf();
+    }
+
     function playCurrent() {
-      const activeFile = files[currentIdx];
-      modal.classList.add("active");
+      if (!displayedFiles.length) return;
+      const activeFile = displayedFiles[currentIdx];
+      playerModal.classList.add("active");
       frameHolder.innerHTML = `
         <iframe 
           src="https://drive.google.com/file/d/${activeFile.id}/preview" 
@@ -466,7 +546,7 @@
     }
 
     function closePlayer() {
-      modal.classList.remove("active");
+      playerModal.classList.remove("active");
       frameHolder.innerHTML = "";
       if (document.fullscreenElement) {
         document.exitFullscreen().catch(() => {});
@@ -476,12 +556,22 @@
       }
     }
 
+    function openUploadModal() {
+      uploadModal.classList.add("active");
+    }
+
+    function closeUploadModal() {
+      uploadModal.classList.remove("active");
+      loadFolderContents(); // Refresh library when closing upload
+    }
+
+    // Mobile landscape rotation lock
     let isLandscape = false;
     async function toggleScreenOrientation() {
       try {
         if (!isLandscape) {
-          if (modal.requestFullscreen) {
-            await modal.requestFullscreen();
+          if (playerModal.requestFullscreen) {
+            await playerModal.requestFullscreen();
           }
           if (screen.orientation && screen.orientation.lock) {
             await screen.orientation.lock("landscape");
@@ -497,12 +587,11 @@
           isLandscape = false;
         }
       } catch (err) {
-        alert("Make sure auto-rotate is toggled on in your phone's quick settings tray.");
+        alert("Make sure auto-rotate is enabled in your phone's notification panel.");
       }
     }
 
-    renderShelf();
+    loadFolderContents();
   </script>
 </body>
-  </html>
-  
+</html>
