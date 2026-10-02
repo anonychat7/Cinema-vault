@@ -8,7 +8,6 @@
     :root {
       --bg: #090a0f;
       --card-bg: rgba(255, 255, 255, 0.05);
-      --accent: #ffffff;
       --accent-red: #e50914;
       --text: #ffffff;
       --text-sub: #9ca3af;
@@ -145,7 +144,7 @@
       margin-top: 4px;
     }
 
-    /* Shelf Library Section */
+    /* Shelf Library */
     .section-title {
       padding: 24px 20px 12px;
       font-size: 1.1rem;
@@ -213,8 +212,8 @@
       overflow: hidden;
     }
 
-    /* Fullscreen Player Modal */
-    #player-modal, #upload-modal {
+    /* Clean Fullscreen Video Player Modal */
+    #player-modal {
       position: fixed;
       inset: 0;
       background: #000;
@@ -223,7 +222,7 @@
       flex-direction: column;
     }
 
-    #player-modal.active, #upload-modal.active {
+    #player-modal.active {
       display: flex;
     }
 
@@ -232,17 +231,17 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
-      background: rgba(0,0,0,0.85);
+      background: rgba(0, 0, 0, 0.7);
+      backdrop-filter: blur(10px);
       position: absolute;
       top: 0;
       left: 0;
       right: 0;
       z-index: 10;
-      backdrop-filter: blur(8px);
     }
 
     .player-action-btn {
-      background: rgba(255,255,255,0.18);
+      background: rgba(255, 255, 255, 0.2);
       border: none;
       color: #fff;
       padding: 8px 16px;
@@ -255,6 +254,7 @@
     .player-frame-box {
       width: 100%;
       height: 100%;
+      background: #000;
     }
 
     .player-frame-box iframe {
@@ -263,9 +263,23 @@
       border: none;
     }
 
-    /* Upload Dialog Styling */
+    /* Upload Dialog */
+    #upload-modal {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.8);
+      backdrop-filter: blur(8px);
+      z-index: 9999;
+      display: none;
+      align-items: center;
+      justify-content: center;
+    }
+
+    #upload-modal.active {
+      display: flex;
+    }
+
     .upload-content {
-      margin: auto;
       max-width: 420px;
       width: 90%;
       background: #141419;
@@ -299,7 +313,7 @@
       display: block;
     }
 
-    /* Floating Bottom Navigation Bar */
+    /* Bottom Floating Nav */
     .bottom-nav-wrap {
       position: fixed;
       bottom: 18px;
@@ -361,7 +375,7 @@
     <div class="hero-content">
       <h1 class="hero-title" id="hero-title">Connecting to Vault...</h1>
       <div class="hero-meta">
-        <span class="badge" id="hero-badge">DRIVE STREAM</span>
+        <span class="badge">DRIVE STREAM</span>
         <span id="hero-size">0 MB</span>
       </div>
       <button class="btn-play" onclick="playCurrent()">
@@ -371,14 +385,14 @@
     </div>
   </section>
 
-  <!-- Category & Media Shelf -->
+  <!-- Shelf -->
   <div class="section-title">
     <h3 id="category-title">All Media</h3>
-    <span id="shelf-subtitle" style="font-size:0.75rem; color:var(--text-sub);">Direct Stream</span>
+    <span style="font-size:0.75rem; color:var(--text-sub);">Direct Stream</span>
   </div>
   <div class="slider-row" id="media-shelf"></div>
 
-  <!-- Player Modal -->
+  <!-- Player Modal (Clean - No Overlapping Buttons) -->
   <div id="player-modal">
     <div class="modal-bar">
       <button class="player-action-btn" onclick="closePlayer()">✕ Close</button>
@@ -389,19 +403,17 @@
 
   <!-- Upload Modal -->
   <div id="upload-modal">
-    <div class="modal-bar">
-      <button class="player-action-btn" onclick="closeUploadModal()">✕ Close</button>
-    </div>
     <div class="upload-content">
       <h2>Add New Media</h2>
-      <p>Upload your video files directly to the shared folder. When the upload completes, refresh this site to stream them immediately.</p>
+      <p>Upload video files directly to the shared folder. Refresh the page once done to view them.</p>
       <a class="open-drive-btn" target="_blank" href="https://drive.google.com/drive/folders/1B4KRBty50Zm_-8Jx_Z7qVF-p-MZCVb5-">
         Open Google Drive Folder ↗
       </a>
+      <button class="player-action-btn" style="background:#222; margin-top:8px;" onclick="closeUploadModal()">Close</button>
     </div>
   </div>
 
-  <!-- Interactive Bottom Navigation -->
+  <!-- Bottom Nav -->
   <div class="bottom-nav-wrap">
     <nav class="bottom-nav">
       <button class="nav-tab active" onclick="switchCategory('all', this)">Home</button>
@@ -412,7 +424,6 @@
   </div>
 
   <script>
-    // Applied credentials:
     const FOLDER_ID = "1B4KRBty50Zm_-8Jx_Z7qVF-p-MZCVb5-".trim();
     const API_KEY = "AIzaSyC85XOzgMNTi63ltxrqx2RRAt67ZOrIY_k".trim();
 
@@ -430,7 +441,6 @@
     const frameHolder = document.getElementById("frame-holder");
 
     async function loadFolderContents() {
-      // Direct REST query with full drive access flags
       const url = `https://www.googleapis.com/drive/v3/files?q='${FOLDER_ID}'+in+parents+and+trashed=false&fields=files(id,name,size,mimeType)&supportsAllDrives=true&includeItemsFromAllDrives=true&key=${API_KEY}`;
 
       try {
@@ -451,7 +461,7 @@
         if (allFiles.length === 0) {
           heroTitle.textContent = "Folder is empty";
           fileCounter.textContent = "0 videos";
-          shelf.innerHTML = "<p style='padding:20px; color:var(--text-sub);'>No videos found in this folder. Tap Upload above to add videos.</p>";
+          shelf.innerHTML = "<p style='padding:20px; color:var(--text-sub);'>No videos found. Use the Upload button to add files.</p>";
           return;
         }
 
@@ -584,7 +594,7 @@
           isLandscape = false;
         }
       } catch (err) {
-        alert("Make sure auto-rotate is enabled in your phone's notification panel.");
+        alert("Make sure auto-rotate is enabled in your phone settings.");
       }
     }
 
