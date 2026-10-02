@@ -22,7 +22,7 @@
       padding: 0;
       -webkit-tap-highlight-color: transparent;
       user-select: none;
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
     }
 
     body {
@@ -33,7 +33,6 @@
       overflow-x: hidden;
     }
 
-    /* Header */
     header {
       position: sticky;
       top: 0;
@@ -300,7 +299,7 @@
       display: block;
     }
 
-    /* Floating Capsule Menu */
+    /* Floating Bottom Navigation Bar */
     .bottom-nav-wrap {
       position: fixed;
       bottom: 18px;
@@ -356,7 +355,7 @@
     </div>
   </header>
 
-  <!-- Hero Banner -->
+  <!-- Hero Section -->
   <section class="hero-container">
     <div class="hero-gradient"></div>
     <div class="hero-content">
@@ -372,14 +371,14 @@
     </div>
   </section>
 
-  <!-- Category Title & Shelf -->
+  <!-- Category & Media Shelf -->
   <div class="section-title">
     <h3 id="category-title">All Media</h3>
     <span id="shelf-subtitle" style="font-size:0.75rem; color:var(--text-sub);">Direct Stream</span>
   </div>
   <div class="slider-row" id="media-shelf"></div>
 
-  <!-- Fullscreen Player Modal -->
+  <!-- Player Modal -->
   <div id="player-modal">
     <div class="modal-bar">
       <button class="player-action-btn" onclick="closePlayer()">✕ Close</button>
@@ -395,14 +394,14 @@
     </div>
     <div class="upload-content">
       <h2>Add New Media</h2>
-      <p>Upload your video file directly to the shared folder. Once the file finishes uploading, refresh the page and it will appear on your streaming site automatically.</p>
-      <a class="open-drive-btn" target="_blank" href="https://drive.google.com/drive/folders/1eQH28Ev2UvL5oFsC2ysgGrYNdGtPgD-K">
+      <p>Upload your video files directly to the shared folder. When the upload completes, refresh this site to stream them immediately.</p>
+      <a class="open-drive-btn" target="_blank" href="https://drive.google.com/drive/folders/1B4KRBty50Zm_-8Jx_Z7qVF-p-MZCVb5-">
         Open Google Drive Folder ↗
       </a>
     </div>
   </div>
 
-  <!-- Bottom Floating Capsule (Fully Interactive) -->
+  <!-- Interactive Bottom Navigation -->
   <div class="bottom-nav-wrap">
     <nav class="bottom-nav">
       <button class="nav-tab active" onclick="switchCategory('all', this)">Home</button>
@@ -413,9 +412,9 @@
   </div>
 
   <script>
-    // Configured directly with your credentials:
-    const FOLDER_ID = "​1B4KRBty50Zm_-8Jx_Z7qVF-p-MZCVb5-";
-    const API_KEY = "AIzaSyC85XOzgMNTi63ltxrqx2RRAt67ZOrIY_k";
+    // Applied credentials:
+    const FOLDER_ID = "1B4KRBty50Zm_-8Jx_Z7qVF-p-MZCVb5-".trim();
+    const API_KEY = "AIzaSyC85XOzgMNTi63ltxrqx2RRAt67ZOrIY_k".trim();
 
     let allFiles = [];
     let displayedFiles = [];
@@ -430,9 +429,9 @@
     const uploadModal = document.getElementById("upload-modal");
     const frameHolder = document.getElementById("frame-holder");
 
-    // Fetch video files using your API Key
     async function loadFolderContents() {
-      const url = `https://www.googleapis.com/drive/v3/files?q='${FOLDER_ID}'+in+parents+and+trashed=false&fields=files(id,name,size,mimeType)&key=${API_KEY}`;
+      // Direct REST query with full drive access flags
+      const url = `https://www.googleapis.com/drive/v3/files?q='${FOLDER_ID}'+in+parents+and+trashed=false&fields=files(id,name,size,mimeType)&supportsAllDrives=true&includeItemsFromAllDrives=true&key=${API_KEY}`;
 
       try {
         const res = await fetch(url);
@@ -452,7 +451,7 @@
         if (allFiles.length === 0) {
           heroTitle.textContent = "Folder is empty";
           fileCounter.textContent = "0 videos";
-          shelf.innerHTML = "<p style='padding:20px; color:var(--text-sub);'>No videos found in this folder. Use the Upload button above.</p>";
+          shelf.innerHTML = "<p style='padding:20px; color:var(--text-sub);'>No videos found in this folder. Tap Upload above to add videos.</p>";
           return;
         }
 
@@ -476,7 +475,7 @@
 
       if (displayedFiles.length === 0) {
         shelf.innerHTML = "<p style='padding:20px; color:var(--text-sub);'>No videos match this category.</p>";
-        heroTitle.textContent = "No Videos in Category";
+        heroTitle.textContent = "No Videos";
         heroSize.textContent = "0 MB";
         return;
       }
@@ -509,7 +508,6 @@
       });
     }
 
-    // Dynamic Filter handler for Home, Movies, TV, 4K
     function switchCategory(cat, tabElement) {
       document.querySelectorAll(".nav-tab").forEach(tab => tab.classList.remove("active"));
       tabElement.classList.add("active");
@@ -562,10 +560,9 @@
 
     function closeUploadModal() {
       uploadModal.classList.remove("active");
-      loadFolderContents(); // Refresh library when closing upload
+      loadFolderContents();
     }
 
-    // Mobile landscape rotation lock
     let isLandscape = false;
     async function toggleScreenOrientation() {
       try {
